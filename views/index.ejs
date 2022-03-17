@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <link rel="stylesheet" href="/stylesheets/index.css">
+</head>
+<body>
+<div class="container">
+    <div class="content">
+        <div class="title"><%= title %></div>
+        <form class="search_form">
+            <label>Task:
+                <input class="input_light" name="search" type="text" value="<%= search %>">
+            </label>
+            <label>Status:
+                <select class="input_light" name="status">
+                    <option <%= status === "none" ? "selected" : "" %> value="none">All</option>
+                    <option <%= status === "completed" ? "selected" : "" %> value="completed">Completed</option>
+                    <option <%= status === "not_completed" ? "selected" : "" %> value="not_completed">Not completed
+                    </option>
+                </select>
+            </label>
+            <button class="submit_button" type="submit" formmethod="get" formaction="/">Search</button>
+            <% if(search !== undefined) { %>
+                <button class="submit_button" type="submit" formmethod="post" formaction="/cancel_search">Reset</button>
+            <% } %>
+        </form>
+        <ul class="todo__list">
+            <% for(var i = 0; i < tasks.length; i++) { %>
+            <li class="list__item">
+                <div class="row">
+                    <form class="form" method="post" action="/change_status">
+                        <input name="id" value="<%= tasks[i].id %>" type="text" hidden>
+                        <input class="checkbox" type="checkbox" <%= tasks[i].completed ? "checked" : "" %>
+                               onchange="this.form.submit()">
+                    </form>
+                    <form class="name_form" method="post" action="/change_name">
+                        <input name="id" value="<%= tasks[i].id %>" type="text" hidden>
+                        <input class="name" name="name" type="text" value="<%= tasks[i].name %>"
+                               onchange="this.form.submit()">
+                    </form>
+                    <form class="form" method="post" action="/add_files" enctype="multipart/form-data">
+                        <input name="id" value="<%= tasks[i].id %>" type="text" hidden>
+                        <input id="new_file_input" name="new_files" type="file" multiple hidden
+                               onchange="this.form.submit()">
+                        <button class="add_button" type="button" title="Add"
+                                onclick="document.getElementById('new_file_input').click()">+
+                        </button>
+                    </form>
+                    <form class="form" method="post" action="/change_date">
+                        <input name="id" value="<%= tasks[i].id %>" type="text" hidden>
+                        <input class="input_very_light" name="date" type="datetime-local" value="<%= tasks[i].date %>"
+                               onchange="this.form.submit()">
+                    </form>
+                    <form class="form" method="post" action="/remove_task">
+                        <input name="id" value="<%= tasks[i].id %>" type="text" hidden>
+                        <button class="remove_button" title="Delete">✖</button>
+                    </form>
+                </div>
+                <div class="row">
+                    <% if (tasks[i].files && tasks[i].files.length > 0) { %>
+                        <div class="files__list">
+                            <% for(var j = 0; j < tasks[i].files.length; j++) { %>
+                            <form class="list__item" method="post">
+                                <input name="id" value="<%= tasks[i].id %>" type="text" hidden>
+                                <input name="path" value="<%= tasks[i].files[j].path %>" type="text" hidden>
+                                <input name="name" value="<%= tasks[i].files[j].originalname %>" type="text" hidden>
+                                <div><%= tasks[i].files[j].originalname %></div>
+                                <div>
+                                    <button class="remove_button" title="Download" formaction="/download_file">⇓
+                                    </button>
+                                    <button class="remove_button" title="Delete" formaction="/remove_file">✖</button>
+                                </div>
+                            </form>
+                            <% } %>
+                        </div>
+                    <% } %>
+                </div>
+            </li>
+            <% } %>
+        </ul>
+        <form class="add_form" method="post" action="/add_task" enctype="multipart/form-data">
+            <label class="label">Task:
+                <input class="input_light" name="name" type="text" minlength="1" maxlength="200" title="Fill this field"
+                       required>
+            </label>
+            <label class="label">Date:
+                <input class="input_light" name="date" type="datetime-local" title="Fill this field" required>
+            </label>
+            <label class="label">Attachments:
+                <input class="input_light" name="files" type="file" multiple title="">
+            </label>
+            <button class="submit_button">Add</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
